@@ -24,6 +24,7 @@ artifacts/*
 logs/*
 !logs/.gitkeep
 exports/
+context/
 
 # IDE
 .vscode/
