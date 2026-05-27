@@ -1,0 +1,28 @@
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "python .agents/hooks/session_start.py"
+timeout = 15
+
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "python .agents/hooks/pre_tool.py"
+timeout = 10
+
+[[hooks.PostToolUse]]
+matcher = "^Write$"
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "python .agents/hooks/post_tool.py"
+timeout = 10
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = "python .agents/hooks/on_stop.py"
+timeout = 15
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = "python .agents/hooks/on_stop.py"
+timeout = 15

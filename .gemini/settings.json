@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {"type": "command", "command": "python .agents/hooks/session_start.py", "timeout": 15}
+    ],
+    "BeforeTool": [
+      {"matcher": "*", "type": "command", "command": "python .agents/hooks/pre_tool.py", "timeout": 10}
+    ],
+    "AfterTool": [
+      {"matcher": "write_file", "type": "command", "command": "python .agents/hooks/post_tool.py", "timeout": 10}
+    ],
+    "AfterAgent": [
+      {"type": "command", "command": "python .agents/hooks/on_stop.py", "timeout": 15}
+    ]
+  }
+}

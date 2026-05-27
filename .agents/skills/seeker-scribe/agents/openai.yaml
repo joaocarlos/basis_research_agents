@@ -1,0 +1,6 @@
+name: "SEEKER scribe"
+implicit_invocation: false
+mcp_tools:
+  - bash
+  - read_file
+  - write_file
