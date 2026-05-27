@@ -269,14 +269,20 @@ def _wait_for_instruction_file(expected_path: Path, break_name: str) -> str:
 
 
 def _extract_instructions(document_content: str) -> str:
-    """Extract the instructions section from a review document."""
+    """Extract instructions from a review document or standalone instructions file.
+
+    Looks for the '**Your instructions:**' marker used in review files.
+    Falls back to returning the full content when no marker is present
+    (standalone instructions files written directly by the researcher).
+    """
     marker = "**Your instructions:**"
     if marker in document_content:
         parts = document_content.split(marker)
         if len(parts) > 1:
             instructions = parts[-1].strip()
             return instructions if instructions else ""
-    return ""
+    # No marker — treat the whole file as instructions
+    return document_content.strip()
 
 
 def _check_contradictions(instructions: str, run_id: str, break_num: int) -> list[str]:

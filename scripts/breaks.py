@@ -40,13 +40,19 @@ def main():
 
     if action == "write0":
         from core.utils import load_config
-        from core.concept_mapper import concept_expand, match_themes_to_problem
+        from core.concept_mapper import expand as concept_expand
         config = load_config()
+        activated = []
         try:
             expansion = concept_expand(problem, run_id, config)
             activated = expansion.get("final_themes", [])
         except Exception:
-            activated = match_themes_to_problem(problem, config)
+            # Keyword fallback: match problem words against theme labels/ids
+            words = set(problem.lower().split())
+            for t in config.get("themes", []):
+                label_words = set((t.get("label", "") + " " + t["theme_id"]).lower().split())
+                if words & label_words:
+                    activated.append(t["theme_id"])
         selected  = [t for t in config.get("themes", []) if t["theme_id"] in activated]
         excluded  = [{"theme_id": t["theme_id"], "label": t.get("label", ""),
                       "reason": "Not activated"}

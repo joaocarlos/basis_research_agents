@@ -37,7 +37,8 @@ def main():
     if args.themes:
         themes = [t for t in config.get("themes", []) if t["theme_id"] in args.themes]
     else:
-        activated = match_themes_to_problem(problem, config)
+        selected, _ = match_themes_to_problem(problem, config.get("themes", []))
+        activated = {t["theme_id"] for t in selected}
         themes = [t for t in config.get("themes", []) if t["theme_id"] in activated]
         if not themes:
             themes = config.get("themes", [])[:5]

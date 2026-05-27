@@ -80,7 +80,7 @@ def save_gaper(run_id: str, data: dict):
             "tree_node_ref":     gap.get("tree_node_ref", ""),
             "references_grounder": gap.get("references_grounder", []),
             "references_historian": gap.get("references_historian", []),
-            "references_current": gap.get("references_current", []),
+            "references_social": gap.get("references_current", gap.get("references_social", [])),
             "dead_end_revisit":  gap.get("dead_end_revisit", False),
             "recurring_pattern": gap.get("recurring_pattern", False),
             "recurring_reason":  gap.get("recurring_reason", ""),
@@ -88,7 +88,28 @@ def save_gaper(run_id: str, data: dict):
         })
         if ok:
             saved += 1
-    print(f"Saved {saved} gaps")
+
+    # Write gaps artifact
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_gaper_gaps.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Gap Analysis — {run_id}\n", "---\n"]
+    high = [g for g in data.get("gaps", []) if g.get("significance") == "High"]
+    med  = [g for g in data.get("gaps", []) if g.get("significance") == "Medium"]
+    low  = [g for g in data.get("gaps", []) if g.get("significance") == "Low"]
+    for label, group in [("High", high), ("Medium", med), ("Low", low)]:
+        if group:
+            lines.append(f"## {label} Significance\n")
+            for g in group:
+                lines.append(f"### [{g.get('gap_origin','?')}] {g.get('gap_type','')}")
+                lines.append(g.get("description", ""))
+                if g.get("significance_reason"):
+                    lines.append(f"*{g['significance_reason']}*")
+                lines.append("")
+    summary = data.get("gap_map_summary", "")
+    if summary:
+        lines += ["\n## Gap Map Summary\n", summary]
+    path.write_text("\n".join(lines))
+    print(f"Saved {saved} gaps | Artifact: {path}")
 
 
 def save_vision(run_id: str, data: dict):
@@ -113,7 +134,22 @@ def save_vision(run_id: str, data: dict):
         })
         if ok:
             saved += 1
-    print(f"Saved {saved} implications")
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_vision_implications.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Vision — Implications\n**Run:** {run_id}\n\n---\n"]
+    for strength in ("Strong", "Moderate", "Speculative"):
+        group = [i for i in data.get("implications", []) if i.get("strength") == strength]
+        if group:
+            lines.append(f"## {strength}\n")
+            for i in group:
+                lines.append(f"### {i.get('implication_type','')}: {i.get('implication','')[:80]}")
+                lines.append(i.get("implication", ""))
+                lines.append(f"*{i.get('strength_reason','')}*\n")
+    meta = data.get("meta_observation", "")
+    if meta:
+        lines += ["\n## Meta-Observation\n", meta]
+    path.write_text("\n".join(lines))
+    print(f"Saved {saved} implications | Artifact: {path}")
 
 
 def save_theorist(run_id: str, data: dict):
@@ -142,7 +178,21 @@ def save_theorist(run_id: str, data: dict):
         })
         if ok:
             saved += 1
-    print(f"Saved {saved} proposals")
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_theorist_proposals.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Theorist — Research Proposals\n**Run:** {run_id}\n\n---\n"]
+    for i, prop in enumerate(data.get("proposals", []), 1):
+        lines.append(f"## Proposal {i}: {prop.get('proposal','')[:80]}")
+        lines.append(prop.get("proposal", ""))
+        lines.append(f"**Type:** {prop.get('proposal_type','')}  **Promise:** {prop.get('promise_rating','')}")
+        if prop.get("promise_reason"):
+            lines.append(f"*{prop['promise_reason']}*")
+        lines.append("")
+    overview = data.get("overview_rationale", "")
+    if overview:
+        lines += ["\n## Overview Rationale\n", overview]
+    path.write_text("\n".join(lines))
+    print(f"Saved {saved} proposals | Artifact: {path}")
 
 
 def save_rude(run_id: str, data: dict):
@@ -179,7 +229,19 @@ def save_rude(run_id: str, data: dict):
                      "infeasible"
             db.update_proposal_status(matched_id, status)
 
-    print(f"Saved {saved} evaluations")
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_rude_evaluations.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Rude — Adversarial Evaluations\n**Run:** {run_id}\n\n---\n"]
+    for ev in data.get("evaluations", []):
+        lines.append(f"## {ev.get('verdict','?').upper()}: {ev.get('proposal_ref','')[:70]}")
+        lines.append(f"**Verdict reason:** {ev.get('verdict_reason','')}")
+        if ev.get("weakest_empirical_link"):
+            lines.append(f"**Weakest link:** {ev['weakest_empirical_link']}")
+        lines.append("")
+    if data.get("overall_assessment"):
+        lines += ["\n## Overall Assessment\n", data["overall_assessment"]]
+    path.write_text("\n".join(lines))
+    print(f"Saved {saved} evaluations | Artifact: {path}")
 
 
 def save_synthesizer(run_id: str, data: dict):
@@ -199,7 +261,23 @@ def save_synthesizer(run_id: str, data: dict):
         "trajectory_statement":       data.get("trajectory_statement", ""),
         "full_narrative":             data.get("full_narrative", ""),
     })
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_synthesizer_narrative.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Synthesizer — Research Narrative\n**Run:** {run_id}\n\n---\n"]
+    if data.get("sharpened_problem"):
+        lines += ["## Sharpened Problem\n", data["sharpened_problem"], ""]
+    if data.get("full_narrative"):
+        lines += ["## Full Narrative\n", data["full_narrative"], ""]
+    if data.get("trajectory_statement"):
+        lines += ["## Trajectory Statement\n", data["trajectory_statement"], ""]
+    tensions = data.get("tensions_and_contradictions", [])
+    if tensions:
+        lines.append("## Tensions and Contradictions\n")
+        for t in tensions:
+            lines.append(f"- {t}")
+    path.write_text("\n".join(lines))
     print(f"Saved synthesis: {synthesis_id}" if ok else "Synthesis save failed")
+    print(f"Artifact: {path}")
 
 
 def save_thinker(run_id: str, data: dict):
@@ -217,7 +295,21 @@ def save_thinker(run_id: str, data: dict):
         })
         if ok:
             saved += 1
-    print(f"Saved {saved} directions")
+    path = Path(__file__).parent.parent / "artifacts" / f"{run_id}_thinker_directions.md"
+    path.parent.mkdir(exist_ok=True)
+    lines = [f"# Thinker — New Research Directions\n**Run:** {run_id}\n\n---\n"]
+    for dist in ("Near", "Mid", "Far"):
+        group = [d for d in data.get("directions", []) if d.get("distance_rating") == dist]
+        if group:
+            lines.append(f"## {dist}-term\n")
+            for d in group:
+                lines.append(f"### {d.get('direction_type','')}: {d.get('direction','')[:80]}")
+                lines.append(d.get("direction", ""))
+                if d.get("reasoning"):
+                    lines.append(f"*{d['reasoning']}*")
+                lines.append("")
+    path.write_text("\n".join(lines))
+    print(f"Saved {saved} directions | Artifact: {path}")
 
 
 def save_scribe(run_id: str, data: dict, output_type: str = "research_brief"):

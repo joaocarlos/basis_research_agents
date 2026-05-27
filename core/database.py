@@ -103,11 +103,13 @@ CREATE TABLE IF NOT EXISTS gaps (
     gap_id          TEXT PRIMARY KEY,
     run_id          TEXT NOT NULL,
     problem_origin  TEXT,
+    gap_origin      TEXT,               -- structural | analytical
     gap_type        TEXT,               -- unstudied / incomplete / contradicted etc.
     description     TEXT NOT NULL,
     significance    TEXT,               -- High / Medium / Low
     significance_reason TEXT,
     primary_evaluation TEXT,            -- answered / partial / unanswered
+    tree_node_ref   TEXT,               -- argument tree node this gap connects to
     references_grounder TEXT,           -- JSON array of source_ids
     references_historian TEXT,          -- JSON array of source_ids
     references_social TEXT,             -- JSON array of source_ids
