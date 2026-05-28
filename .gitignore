@@ -13,6 +13,7 @@ env/
 db/pipeline.db
 db/conceptnet.db
 db/consensus_tokens.json
+core/db/pipeline.db
 
 # Credentials
 .env
