@@ -209,15 +209,15 @@ def save_rude(run_id: str, data: dict):
                 break
 
         ok = db.insert_evaluation({
-            "evaluation_id":    ev_id,
-            "run_id":           run_id,
-            "proposal_id":      matched_id or "",
-            "verdict":          ev.get("verdict", "insufficient_evidence"),
-            "verdict_reason":   ev.get("verdict_reason", ""),
-            "weakest_link":     ev.get("weakest_empirical_link", ""),
-            "dead_end_refs":    ev.get("dead_end_references", []),
-            "social_refs":      ev.get("social_evidence_references", []),
-            "evidence_needed":  ev.get("evidence_to_change_verdict", ""),
+            "evaluation_id":              ev_id,
+            "run_id":                     run_id,
+            "proposal_id":                matched_id or "",
+            "verdict":                    ev.get("verdict", "insufficient_evidence"),
+            "verdict_reason":             ev.get("verdict_reason", ""),
+            "weakest_empirical_link":     ev.get("weakest_empirical_link", ""),
+            "dead_end_references":        ev.get("dead_end_references", []),
+            "social_evidence_references": ev.get("social_evidence_references", []),
+            "evidence_to_change_verdict": ev.get("evidence_to_change_verdict", ""),
         })
         if ok:
             saved += 1
