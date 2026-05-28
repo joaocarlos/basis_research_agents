@@ -289,9 +289,9 @@ def save_thinker(run_id: str, data: dict):
             "run_id":           run_id,
             "direction":        d.get("direction", ""),
             "direction_type":   d.get("direction_type", "new_research"),
-            "grounding_ref":    d.get("grounding_reference", ""),
+            "grounding_reference": d.get("grounding_reference", ""),
             "distance_rating":  d.get("distance_rating", "Mid"),
-            "reasoning":        d.get("reasoning", ""),
+            "problem_origin":   d.get("reasoning", ""),
         })
         if ok:
             saved += 1
